@@ -3,27 +3,300 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Travel: Stats tracker</title>
-<meta name="description" content="A travel logbook for iPhone: the countries you have been to, your trips and flights on a world map. Your data stays in your own iCloud.">
+<title>Travel: Stats tracker — your countries, trips and flights on one map</title>
+<meta name="description" content="A travel logbook for iPhone: every country you have been to, your trips and the flights that got you there, on a world map and a globe that replay them. Kept in your own iCloud. No account, no ads.">
+<link rel="canonical" href="https://johannesbeiser.github.io/travelstats-site/">
+<link rel="icon" href="img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <meta name="theme-color" content="#121211">
-<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://johannesbeiser.github.io/travelstats-site/">
+<meta property="og:site_name" content="Travel: Stats tracker">
+<meta property="og:title" content="Travel: Stats tracker">
+<meta property="og:description" content="Every country you have been to, your trips and your flights, on a map and a globe that replay them.">
+<meta property="og:image" content="https://johannesbeiser.github.io/travelstats-site/demo/share.jpg">
+<meta property="og:image:alt" content="Travel on an iPhone: a globe with flight routes drawn between the countries visited.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="fonts/Geist-Light.ttf" as="font" type="font/ttf" crossorigin>
+<style>
+  /* The app's Night palette and Geist, as in style.css (which the other three pages use). This
+     page carries its own sheet so a change here can never move privacy, terms or support. */
+  @font-face { font-family:"Geist"; font-weight:300; font-display:swap; src:url("fonts/Geist-Light.ttf") format("truetype"); }
+  @font-face { font-family:"Geist"; font-weight:400; font-display:swap; src:url("fonts/Geist-Regular.ttf") format("truetype"); }
+  @font-face { font-family:"Geist"; font-weight:600; font-display:swap; src:url("fonts/Geist-SemiBold.ttf") format("truetype"); }
+
+  :root {
+    color-scheme: dark;
+    --paper:#121211; --ink:#F3F1EB; --faint:#8C897F; --hair:#2A2926; --wash:#1C1B19;
+    --amber:#F2B233; --link:#F2B233; --on-amber:#121211;
+    --bezel:#050505;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { color-scheme: light;
+            --paper:#F6F5F2; --ink:#1C1B19; --faint:#736F66; --hair:#E4E2DD; --wash:#FFFFFF;
+            --amber:#D08A00; --link:#9E6500; --on-amber:#FFFFFF; --bezel:#1C1B19; }
+  }
+  * { box-sizing:border-box; }
+  html { background:var(--paper); -webkit-text-size-adjust:100%; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-size:17px; line-height:1.6;
+         font-family:"Geist",ui-sans-serif,system-ui,-apple-system,"Helvetica Neue",sans-serif;
+         -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:62rem; margin:0 auto; padding:0 1.5rem; }
+  a { color:var(--link); text-underline-offset:.18em; text-decoration-thickness:1px; }
+  :focus-visible { outline:2px solid var(--amber); outline-offset:3px; border-radius:4px; }
+
+  /* ---- top ---- */
+  header.hero { padding:4.5rem 0 2.5rem; text-align:center; }
+  .icon { display:block; width:88px; height:88px; margin:0 auto 1.5rem; border-radius:20px;
+          border:1px solid var(--hair); }
+  .mark { color:var(--amber); font-weight:600; letter-spacing:-.01em; font-size:1rem;
+          display:block; margin:0 0 .5rem; }
+  h1 { font-size:clamp(2.3rem,7vw,3.6rem); font-weight:300; letter-spacing:-.035em; line-height:1.05;
+       margin:0 0 .8rem; }
+  .tagline { font-size:clamp(1.05rem,2.8vw,1.25rem); color:var(--faint); margin:0 auto 2rem;
+             max-width:32rem; text-wrap:balance; }
+  .cta { display:inline-flex; align-items:center; gap:.55rem; background:var(--amber);
+         color:var(--on-amber); font-weight:600; font-size:1rem; text-decoration:none;
+         padding:.8rem 1.6rem; border-radius:100px; transition:transform .12s ease; }
+  .cta:hover { transform:translateY(-1px); }
+  .cta svg { width:18px; height:18px; fill:currentColor; }
+  .cta-note { display:block; margin-top:.9rem; font-size:.88rem; color:var(--faint); }
+
+  /* ---- the tour ---- */
+  section.tour { padding:2.5rem 0 4.5rem; border-bottom:1px solid var(--hair); }
+  .tour .wrap { display:grid; gap:2.2rem; grid-template-columns:1fr; justify-items:center; align-items:center; }
+  @media (min-width:56rem) {
+    .tour .wrap { grid-template-columns:minmax(0,330px) minmax(0,1fr); gap:4.5rem; justify-items:stretch; }
+  }
+  .tour .wrap > .tour-text { width:100%; min-width:0; }
+
+  /* The bezel is drawn, not filmed: the simulator records the screen alone. */
+  .phone { position:relative; width:100%; max-width:330px; background:var(--bezel);
+           border-radius:min(13.5%,46px); padding:min(2.6%,9px);
+           box-shadow:0 2px 8px rgba(0,0,0,.25), 0 26px 60px rgba(0,0,0,.35); }
+  .phone::after { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+                  border:1px solid rgba(255,255,255,.09); }
+  .phone video { display:block; width:100%; aspect-ratio:720 / 1566; height:auto;
+                 border-radius:min(11.5%,38px); background:#121211; object-fit:cover; }
+
+  .panels { position:relative; min-height:8rem; transition:height .35s ease; }
+  .panel { position:absolute; inset:0; opacity:0; transform:translateY(10px); pointer-events:none;
+           transition:opacity .45s ease, transform .45s ease; }
+  .panel.on { opacity:1; transform:none; }
+  .panel .n { display:block; color:var(--amber); font-size:.85rem; font-weight:600;
+              letter-spacing:.02em; margin-bottom:.6rem; font-variant-numeric:tabular-nums; }
+  .panel h2 { font-size:clamp(1.5rem,4vw,2.15rem); font-weight:300; letter-spacing:-.025em;
+              line-height:1.15; margin:0 0 .75rem; text-wrap:balance; }
+  .panel p { margin:0; color:var(--faint); font-size:1.05rem; max-width:30rem; text-wrap:pretty; }
+  @media (prefers-reduced-motion: reduce) {
+    .panel, .panel.on { transition:opacity .2s linear; transform:none; }
+    .panels { transition:none; }
+  }
+
+  /* One tick per section, filling as it plays; each jumps there. */
+  .ticks { display:flex; gap:5px; margin-top:1.6rem; max-width:30rem; }
+  .tick { flex:1; min-width:0; height:20px; padding:0; border:0; background:none; cursor:pointer;
+          display:flex; align-items:center; }
+  .tick .bar { display:block; width:100%; height:3px; border-radius:2px; overflow:hidden;
+               background:var(--hair); }
+  .tick:hover .bar { background:var(--faint); }
+  .tick i { display:block; height:100%; width:0; background:var(--amber); }
+
+  /* ---- also ---- */
+  section.also { padding:4.5rem 0; border-bottom:1px solid var(--hair); }
+  section.also h2 { font-size:clamp(1.5rem,4vw,2rem); font-weight:300; letter-spacing:-.025em;
+                    text-align:center; margin:0; }
+  .lines { list-style:none; padding:0; margin:2rem auto 0; max-width:42rem; }
+  .lines li { padding:1rem 0; border-bottom:1px solid var(--hair); color:var(--faint); text-wrap:pretty; }
+  .lines li:first-child { border-top:1px solid var(--hair); }
+  .lines b { color:var(--ink); font-weight:600; }
+
+  noscript ul { list-style:none; padding:0; margin:0; max-width:30rem; }
+  noscript li { padding:.6rem 0; color:var(--faint); }
+  noscript b { color:var(--ink); }
+
+  footer { padding:2.5rem 0 3.5rem; text-align:center; color:var(--faint); font-size:.92rem; }
+  footer nav { display:flex; flex-wrap:wrap; justify-content:center; gap:.5rem 1.6rem; margin-bottom:1rem; }
+  footer a { color:var(--faint); }
+  footer a:hover { color:var(--ink); }
+
+  /* Narrow screens: the phone is sized by height, so its picture and the words about it share
+     the screen (Corridor's measurement: the width comes from the height, not from aspect-ratio,
+     because WebKit gives a shrink-wrapped parent nothing from aspect-ratio on a non-replaced box). */
+  @media (max-width:55.99rem) {
+    header.hero { padding:3rem 0 1rem; }
+    section.tour { padding:1.5rem 0 3.5rem; }
+    .tour .wrap { gap:1.6rem; }
+    .phone { width:fit-content; max-width:100%; }
+    .phone video {
+      --film-h:min(66svh, calc(100svh - 17rem), calc((100vw - 4.2rem) * 1566 / 720));
+      height:var(--film-h); width:calc(var(--film-h) * 720 / 1566); max-width:100%;
+    }
+  }
+</style>
 </head>
 <body>
-<div class="wrap">
-  <span class="mark">travel</span>
 
-  <h1>Travel: Stats tracker</h1>
-  <p class="sub">A travel logbook for iPhone: the countries you have been to, your trips and their
-    flights, and a world map that replays them. Your data stays on your devices and in your own
-    iCloud.</p>
+<header class="hero">
+  <div class="wrap">
+    <img class="icon" src="img/icon.png" width="88" height="88" alt="The Travel app icon: a low-poly globe in amber on black.">
+    <span class="mark">travel</span>
+    <h1>Travel: Stats tracker</h1>
+    <p class="tagline">Every country you’ve been to, every trip and every flight, on a map that replays them.</p>
+    <a class="cta" href="https://apps.apple.com/app/id6815340107">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.05 12.54c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.19-1.72-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.87-.76-1.48.02-2.84.86-3.6 2.18-1.53 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.25 2.74 2.2 1.1-.04 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.08 2.65-2.14.84-1.23 1.18-2.42 1.2-2.48-.03-.01-2.29-.88-2.31-3.5zM14.9 5.9c.6-.74 1.01-1.76.9-2.78-.87.04-1.93.58-2.56 1.31-.56.65-1.06 1.69-.93 2.69.97.07 1.97-.49 2.59-1.22z"/></svg>
+      Coming to the App Store
+    </a>
+    <span class="cta-note">Free · iPhone · no account, no ads</span>
+  </div>
+</header>
 
-  <nav class="links">
-    <a href="support.html">Support</a>
-    <a href="privacy.html">Privacy</a>
-    <a href="terms.html">Terms</a>
-  </nav>
+<section class="tour" id="tour">
+  <div class="wrap">
+    <div class="phone">
+      <video id="film" playsinline muted loop preload="metadata" poster="demo/poster.jpg"
+             aria-label="A tour of Travel on an iPhone: the world map filling in, the countries list, flights replayed on a globe, the trips list and the Academy's shape quiz.">
+        <source src="demo/landing-tour.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="tour-text">
+      <div class="panels" id="panels"></div>
+      <div class="ticks" id="ticks"></div>
+      <noscript>
+      <ul>
+      <!-- demo-noscript -->
+      <li><b>Every country, in the order you got there</b> — Press play and the map fills in one first visit at a time, from your first trip to your last.</li>
+      <li><b>All your countries</b> — Newest first, each with the day you arrived, and how much of the world that is.</li>
+      <li><b>Every flight, on a globe</b> — Your routes are drawn leg by leg, in the order you flew them, and each country lights up as you land.</li>
+      <li><b>Every trip</b> — Its days, its countries, its flights and what it cost, from the first one on.</li>
+      <li><b>Learn about the countries you visited</b> — Refresh what you know about the countries you’ve already been to: their capitals, flags, shapes and currencies.</li>
+      <!-- /demo-noscript -->
+      </ul>
+      </noscript>
+    </div>
+  </div>
+</section>
 
-  <footer>&copy; 2026 Johannes Beiser</footer>
-</div>
+<section class="also">
+  <div class="wrap">
+    <h2>Also in the app</h2>
+    <ul class="lines">
+      <li><b>Record your trips</b> — the countries you stayed in, the flights you took and what it cost. Your flights list is built from your trips, so there is nothing to enter twice.</li>
+      <li><b>Every airport and airline, counted</b> — how often you’ve been through each airport and flown with each airline.</li>
+      <li><b>A globe that replays your flights</b> — spin it, then watch every route drawn again in the order you flew it.</li>
+      <li><b>iCloud sync, no account</b> — your data stays on your devices and in your own iCloud. Nothing to sign up for, and nobody else can read it.</li>
+      <li><b>Hikes and banknotes, if you want them</b> — log your hikes, and collect a banknote from every currency. Both are optional.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <nav>
+      <a href="support.html">Support</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+    </nav>
+    &copy; 2026 Johannes Beiser
+  </div>
+</footer>
+
+<!-- Written by TravelStats/Tools/demo/publish-demo.py (app repo) from the take that produced the
+     video, so the words beside the phone cannot drift from it. Do not edit by hand: change the
+     words in docs/demo/landing-tour.json there and publish again. -->
+<script id="demo-timeline" type="application/json">
+{"path": "landing-tour", "durationSeconds": 57.4, "sections": [{"id": "map-replay", "start": 0.0, "end": 14.1, "title": "Every country, in the order you got there", "body": "Press play and the map fills in one first visit at a time, from your first trip to your last."}, {"id": "countries", "start": 14.1, "end": 20.967, "title": "All your countries", "body": "Newest first, each with the day you arrived, and how much of the world that is."}, {"id": "globe-flights", "start": 20.967, "end": 38.567, "title": "Every flight, on a globe", "body": "Your routes are drawn leg by leg, in the order you flew them, and each country lights up as you land."}, {"id": "trips", "start": 38.567, "end": 45.6, "title": "Every trip", "body": "Its days, its countries, its flights and what it cost, from the first one on."}, {"id": "academy", "start": 45.6, "end": 57.4, "title": "Learn about the countries you visited", "body": "Refresh what you know about the countries you’ve already been to: their capitals, flags, shapes and currencies."}]}
+</script>
+
+<script>
+(function () {
+  var film = document.getElementById('film');
+  var panelHost = document.getElementById('panels');
+  var tickHost = document.getElementById('ticks');
+  var data = JSON.parse(document.getElementById('demo-timeline').textContent || '{}');
+  var sections = (data.sections || []).filter(function (s) { return s.title; });
+  if (!film || !sections.length) { return; }
+
+  var panels = sections.map(function (s, i) {
+    var el = document.createElement('div');
+    el.className = 'panel';
+    var n = document.createElement('span');
+    n.className = 'n';
+    n.textContent = (i + 1) + ' / ' + sections.length;
+    var h = document.createElement('h2');
+    h.textContent = s.title;
+    var p = document.createElement('p');
+    p.textContent = s.body;
+    el.appendChild(n); el.appendChild(h); el.appendChild(p);
+    panelHost.appendChild(el);
+    return el;
+  });
+
+  var ticks = sections.map(function (s, i) {
+    var t = document.createElement('button');
+    t.type = 'button';
+    t.className = 'tick';
+    t.setAttribute('aria-label', 'Jump to: ' + s.title);
+    var bar = document.createElement('span');
+    bar.className = 'bar';
+    var fill = document.createElement('i');
+    bar.appendChild(fill);
+    t.appendChild(bar);
+    t.addEventListener('click', function () { film.currentTime = s.start + 0.05; show(i); });
+    tickHost.appendChild(t);
+    return fill;
+  });
+
+  // The block follows the showing panel's own height; the column keeps the tallest as its floor,
+  // so nothing below the tour moves when a longer panel comes on.
+  var showing = -1, heights = [];
+  var column = panelHost.parentNode;
+  function fit() {
+    column.style.minHeight = '0';
+    heights = panels.map(function (el) {
+      el.style.position = 'relative';
+      var h = el.offsetHeight;
+      el.style.position = '';
+      return h;
+    });
+    panelHost.style.height = Math.max.apply(Math, heights) + 'px';
+    column.style.minHeight = column.offsetHeight + 'px';
+    panelHost.style.height = (heights[Math.max(0, showing)] || 0) + 'px';
+  }
+  function show(i) {
+    if (i === showing) { return; }
+    if (panels[showing]) { panels[showing].classList.remove('on'); }
+    panels[i].classList.add('on');
+    panelHost.style.height = heights[i] + 'px';
+    ticks.forEach(function (f, n) { if (n < i) { f.style.width = '100%'; } else if (n > i) { f.style.width = '0'; } });
+    showing = i;
+  }
+  fit(); show(0);
+  window.addEventListener('resize', fit);
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fit); }
+
+  film.addEventListener('timeupdate', function () {
+    var t = film.currentTime, at = 0;
+    for (var i = 0; i < sections.length; i++) { if (t >= sections[i].start) { at = i; } }
+    show(at);
+    var s = sections[at];
+    ticks[at].style.width = Math.min(100, Math.max(0, (t - s.start) / Math.max(0.001, s.end - s.start) * 100)) + '%';
+  });
+
+  // Muted, inline autoplay once the page has loaded; some WebKit browsers refuse a call with no
+  // gesture behind it, so the first touch, scroll or click tries again (a no-op if playing).
+  // Reduced motion: no autoplay; the film gets its own controls and waits to be started.
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    film.controls = true;
+    return;
+  }
+  function start() { var p = film.play(); if (p && p.catch) { p.catch(function () {}); } }
+  if (document.readyState === 'complete') { setTimeout(start, 600); }
+  else { window.addEventListener('load', function () { setTimeout(start, 600); }); }
+  ['touchstart', 'scroll', 'click'].forEach(function (e) {
+    window.addEventListener(e, start, { passive: true, once: true });
+  });
+}());
+</script>
 </body>
 </html>
