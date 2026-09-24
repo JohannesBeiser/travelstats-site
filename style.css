@@ -1,0 +1,41 @@
+/* TravelStats — the app's Night palette: near-black, warm off-white, amber as a small accent.
+   Dark first, because the app is. A light variant follows the reader's system setting. */
+@font-face { font-family:"Geist"; font-weight:300; font-display:swap; src:url("fonts/Geist-Light.ttf") format("truetype"); }
+@font-face { font-family:"Geist"; font-weight:400; font-display:swap; src:url("fonts/Geist-Regular.ttf") format("truetype"); }
+@font-face { font-family:"Geist"; font-weight:600; font-display:swap; src:url("fonts/Geist-SemiBold.ttf") format("truetype"); }
+
+:root {
+  color-scheme: dark;
+  --paper:#121211; --ink:#F3F1EB; --faint:#8C897F; --hair:#2A2926; --wash:#1C1B19;
+  --amber:#F2B233; --link:#F2B233;
+}
+@media (prefers-color-scheme: light) {
+  :root { color-scheme: light;
+          --paper:#F6F5F2; --ink:#1C1B19; --faint:#736F66; --hair:#E4E2DD; --wash:#FFFFFF;
+          --amber:#D08A00; --link:#9E6500; }
+}
+* { box-sizing:border-box; }
+html { background:var(--paper); -webkit-text-size-adjust:100%; }
+body { margin:0; background:var(--paper); color:var(--ink); font-size:17px; line-height:1.65;
+       font-family:"Geist",ui-sans-serif,system-ui,-apple-system,"Helvetica Neue",sans-serif;
+       -webkit-font-smoothing:antialiased; }
+.wrap { max-width:42rem; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
+a { color:var(--link); text-underline-offset:.18em; text-decoration-thickness:1px; }
+.mark { color:var(--amber); font-weight:600; letter-spacing:-.01em; text-decoration:none;
+        font-size:1.05rem; display:inline-block; margin-bottom:2.2rem; }
+h1 { font-size:clamp(2rem,6vw,2.6rem); font-weight:300; letter-spacing:-.03em; line-height:1.15;
+     margin:0 0 .4rem; }
+.sub { color:var(--faint); margin:0 0 .6rem; }
+.date { color:var(--faint); font-size:.9rem; margin:0 0 2.5rem; }
+h2 { font-size:1.15rem; font-weight:600; letter-spacing:-.012em; margin:2.4rem 0 .6rem; }
+h3 { font-size:1.02rem; font-weight:600; margin:1.6rem 0 .25rem; }
+p, li { text-wrap:pretty; }
+p.a { color:var(--faint); margin:.25rem 0 0; }
+ul { padding-left:1.2rem; }
+li { margin:.4rem 0; }
+.lead { background:var(--wash); border:1px solid var(--hair); border-radius:12px;
+        padding:1.1rem 1.3rem; }
+nav.links { display:flex; flex-wrap:wrap; gap:.4rem 1.4rem; margin-top:2rem; }
+footer { border-top:1px solid var(--hair); margin-top:3rem; padding-top:1.4rem;
+         color:var(--faint); font-size:.92rem; }
+footer a { color:var(--faint); }
