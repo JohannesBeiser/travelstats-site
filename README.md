@@ -18,3 +18,8 @@ requests. A light variant follows the reader's system setting.
 
 **The privacy page describes what the app does**, checked against its code and
 `PrivacyInfo.xcprivacy`: the app changes first, and this page in the same release.
+
+**`index.html` is a placeholder.** A landing page with a video tour replaces it after TestFlight.
+`privacy.html`, `terms.html` and `support.html` must keep their names and stay at the root:
+App Store Connect links to them (privacy policy URL, support URL; the marketing URL is the root).
+Shared styling is in `style.css`; a new landing page can use its own without touching theirs.
