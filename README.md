@@ -9,6 +9,7 @@ step, no dependencies:
 | `privacy.html` | the privacy policy — **required by App Store Connect** |
 | `support.html` | the support page — **required by App Store Connect** |
 | `terms.html` | the terms of use |
+| `credits.html` | licences and attribution for the app's data and font (linked from every footer) |
 
 Served by GitHub Pages from `main`, at the root. Editing a file and pushing publishes it.
 
